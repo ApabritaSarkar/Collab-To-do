@@ -1,0 +1,18 @@
+# Ignore node_modules and environment files
+node_modules/
+.env
+.env.local
+
+# Build files
+build/
+dist/
+
+# System/Editor files
+.DS_Store
+*.log
+
+# VSCode
+.vscode/
+
+# Optional: skip coverage/test artifacts
+coverage/
