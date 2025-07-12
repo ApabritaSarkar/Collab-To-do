@@ -22,7 +22,7 @@ const Login = () => {
       setUser(res.data.user);
       setToken(res.data.token);
       toast.success("Logged in successfully!");
-      navigate("/dashboard");
+      navigate("/room");
     } catch (err) {
       toast.error(err.response?.data?.message || "Login failed");
     } finally {

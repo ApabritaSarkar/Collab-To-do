@@ -6,13 +6,16 @@ import socket from "../api/socket";
 import ActivityLog from "../components/ActivityLog";
 import { toast } from "sonner";
 import { ClipLoader } from "react-spinners";
+import { useParams } from "react-router-dom";
 
 const columns = ["Todo", "In Progress", "Done"];
 
 const Dashboard = () => {
   const { token } = useContext(AuthContext);
+  const { roomId } = useParams();
 
   const [tasks, setTasks] = useState([]);
+  const [roomInfo, setRoomInfo] = useState(null);
   const [newTask, setNewTask] = useState({
     title: "",
     description: "",
@@ -21,16 +24,25 @@ const Dashboard = () => {
   const [loading, setLoading] = useState(false);
   const [assigningTaskId, setAssigningTaskId] = useState(null);
 
-  // ──────────────────────── Handlers ────────────────────────
-
   const fetchTasks = async () => {
     try {
-      const res = await API.get("/tasks", {
+      const res = await API.get(`/tasks/room/${roomId}`, {
         headers: { Authorization: `Bearer ${token}` },
       });
       setTasks(res.data);
     } catch {
       toast.error("Failed to fetch tasks");
+    }
+  };
+
+  const fetchRoomDetails = async () => {
+    try {
+      const res = await API.get(`/rooms/${roomId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      setRoomInfo(res.data);
+    } catch {
+      toast.error("Failed to load room info");
     }
   };
 
@@ -43,9 +55,13 @@ const Dashboard = () => {
     setLoading(true);
 
     try {
-      const res = await API.post("/tasks", newTask, {
-        headers: { Authorization: `Bearer ${token}` },
-      });
+      const res = await API.post(
+        "/tasks",
+        { ...newTask, roomId },
+        {
+          headers: { Authorization: `Bearer ${token}` },
+        }
+      );
 
       setTasks((prev) => [...prev, res.data]);
       socket.emit("task-changed", {
@@ -74,7 +90,7 @@ const Dashboard = () => {
     try {
       const res = await API.put(
         `/tasks/${draggableId}`,
-        { status: newStatus, updatedAt: originalUpdatedAt },
+        { status: newStatus, updatedAt: originalUpdatedAt, roomId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
 
@@ -95,7 +111,7 @@ const Dashboard = () => {
         if (confirm) {
           await API.put(
             `/tasks/${draggableId}`,
-            { status: newStatus },
+            { status: newStatus, roomId },
             {
               headers: { Authorization: `Bearer ${token}` },
             }
@@ -114,7 +130,7 @@ const Dashboard = () => {
     try {
       const res = await API.put(
         `/tasks/smart-assign/${taskId}`,
-        {},
+        { roomId },
         { headers: { Authorization: `Bearer ${token}` } }
       );
       setTasks((prev) => prev.map((t) => (t._id === taskId ? res.data : t)));
@@ -127,10 +143,9 @@ const Dashboard = () => {
     }
   };
 
-  // ──────────────────────── Effects ────────────────────────
-
   useEffect(() => {
     fetchTasks();
+    fetchRoomDetails();
 
     socket.on("task-updated", (updatedTask) => {
       setTasks((prev) =>
@@ -141,20 +156,21 @@ const Dashboard = () => {
     return () => {
       socket.off("task-updated");
     };
-  }, [token]);
-
-  // ──────────────────────── Helpers ────────────────────────
+  }, [token, roomId]);
 
   const getTasksByStatus = (status) =>
     tasks.filter((task) => task.status === status);
 
-  // ──────────────────────── Render ────────────────────────
-
   return (
     <div className="min-h-screen bg-slate-950 text-white p-6 flex flex-col md:flex-row gap-6 overflow-x-auto">
-      {/* Left Side: Form + Board */}
       <div className="flex-1 space-y-6">
-        {/* Add Task Form */}
+        {roomInfo && (
+          <div className="bg-slate-800 p-4 rounded-xl text-sm text-slate-300 flex flex-col md:flex-row md:items-center md:justify-between">
+            <p>🛠 Room: <strong>{roomInfo.name}</strong></p>
+            <p>🔐 Code: <code className="text-indigo-400">{roomInfo.code}</code></p>
+          </div>
+        )}
+
         <div className="bg-slate-900 p-6 rounded-xl shadow-lg">
           <h3 className="text-2xl font-semibold mb-4">Add New Task</h3>
           <form onSubmit={handleAddTask} className="grid gap-4 md:grid-cols-2">
@@ -195,7 +211,6 @@ const Dashboard = () => {
           </form>
         </div>
 
-        {/* Kanban Board */}
         <DragDropContext onDragEnd={onDragEnd}>
           <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
             {columns.map((col) => (
@@ -232,7 +247,7 @@ const Dashboard = () => {
                               Priority: {task.priority}
                             </p>
                             <p className="text-xs text-slate-500">
-                              Assigned to:{" "}
+                              Assigned to: {" "}
                               {task.assignedTo?.name || "Unassigned"}
                             </p>
                             <button
@@ -259,7 +274,6 @@ const Dashboard = () => {
         </DragDropContext>
       </div>
 
-      {/* Right Side: Activity Log */}
       <div className="w-full md:w-80">
         <ActivityLog />
       </div>

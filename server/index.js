@@ -8,6 +8,7 @@ const { Server } = require("socket.io");
 
 const authRoutes = require("./routes/authRoutes");
 const taskRoutes = require("./routes/taskRoutes");
+const roomRoutes = require('./routes/room');
 const protect = require("./middleware/authMiddleware");
 
 const app = express();
@@ -26,6 +27,7 @@ app.use(express.json());
 // Routes
 app.use("/api/auth", authRoutes);
 app.use("/api/tasks", taskRoutes);
+app.use('/api/rooms', roomRoutes);
 
 // Example protected test route
 app.get("/api/private", protect, (req, res) => {
