@@ -4,13 +4,22 @@ const logAction = require('./logAction');
 const ActionLog = require('../models/ActionLog');
 
 // ──────────────────────── Get Recent Logs ────────────────────────
-exports.getRecentLogs = async (req, res) => {
-  const logs = await ActionLog.find()
-    .sort({ timestamp: -1 })
-    .limit(20)
-    .populate('user', 'name email')
-    .populate('task', 'title');
-  res.json(logs);
+exports.getLogsByRoom = async (req, res) => {
+  try {
+    const { roomId } = req.query;
+    if (!roomId) return res.status(400).json({ message: "roomId is required" });
+
+    const logs = await ActionLog.find({ room: roomId })
+      .sort({ timestamp: -1 })
+      .limit(20)
+      .populate('user', 'name email')
+      .populate('task', 'title');
+
+    res.json(logs);
+  } catch (err) {
+    console.error("Error fetching logs:", err);
+    res.status(500).json({ message: 'Failed to fetch logs' });
+  }
 };
 
 // ──────────────────────── Get All Tasks (by room) ────────────────────────

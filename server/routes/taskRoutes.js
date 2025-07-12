@@ -7,11 +7,11 @@ const {
   createTask,
   updateTask,
   deleteTask,
-  getRecentLogs    
+  getLogsByRoom,
+  smartAssign,
 } = require('../controllers/taskController');
-const { smartAssign } = require('../controllers/taskController');
 
-router.get('/logs/recent', protect, getRecentLogs);
+router.get('/logs', protect, getLogsByRoom);
 router.get('/room/:roomId', protect, getTasksByRoom);
 router.get('/', protect, getTasks);
 router.post('/', protect, createTask);
