@@ -25,28 +25,26 @@ const ActivityLog = () => {
     return () => clearInterval(interval);
   }, [token]);
 
-  return (
-    <div style={{
-      width: '300px',
-      background: '#f9f9f9',
-      padding: '1rem',
-      borderLeft: '1px solid #ddd',
-      overflowY: 'auto',
-      maxHeight: '100vh'
-    }}>
-      <h3>Activity Log</h3>
-      <ul style={{ listStyle: 'none', paddingLeft: 0 }}>
-        {logs.map(log => (
-          <li key={log._id} style={{ marginBottom: '1rem' }}>
-            <div style={{ fontSize: '0.9rem' }}>{log.message}</div>
-            <div style={{ fontSize: '0.75rem', color: '#666' }}>
-              By <strong>{log.user.name}</strong> | {new Date(log.timestamp).toLocaleString()}
-            </div>
-          </li>
-        ))}
-      </ul>
-    </div>
-  );
+return (
+  <div className="w-full md:w-80 bg-slate-900 text-white p-4 rounded-xl shadow-lg h-full max-h-screen overflow-y-auto">
+    <h3 className="text-xl font-semibold mb-4 text-white">Activity Log 📜</h3>
+    <ul className="space-y-4">
+      {logs.map((log) => (
+        <li
+          key={log._id}
+          className="border-l-4 border-indigo-500 pl-3 bg-slate-800 rounded-md p-3"
+        >
+          <div className="text-sm text-white">{log.message}</div>
+          <div className="text-xs text-slate-400 mt-1">
+            By <span className="font-medium text-emerald-400">{log.user.name}</span> |{' '}
+            {new Date(log.timestamp).toLocaleString()}
+          </div>
+        </li>
+      ))}
+    </ul>
+  </div>
+);
+
 };
 
 export default ActivityLog;

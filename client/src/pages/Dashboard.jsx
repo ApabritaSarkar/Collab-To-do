@@ -4,6 +4,8 @@ import AuthContext from "../context/AuthContext";
 import { DragDropContext, Droppable, Draggable } from "react-beautiful-dnd";
 import socket from "../api/socket";
 import ActivityLog from "../components/ActivityLog";
+import { toast } from "sonner";
+import { ClipLoader } from "react-spinners";
 
 const columns = ["Todo", "In Progress", "Done"];
 
@@ -16,6 +18,8 @@ const Dashboard = () => {
     description: "",
     priority: "Medium",
   });
+  const [loading, setLoading] = useState(false);
+  const [assigningTaskId, setAssigningTaskId] = useState(null);
 
   // ──────────────────────── Handlers ────────────────────────
 
@@ -26,7 +30,7 @@ const Dashboard = () => {
       });
       setTasks(res.data);
     } catch {
-      alert("Failed to fetch tasks");
+      toast.error("Failed to fetch tasks");
     }
   };
 
@@ -36,6 +40,8 @@ const Dashboard = () => {
 
   const handleAddTask = async (e) => {
     e.preventDefault();
+    setLoading(true);
+
     try {
       const res = await API.post("/tasks", newTask, {
         headers: { Authorization: `Bearer ${token}` },
@@ -48,8 +54,11 @@ const Dashboard = () => {
       });
 
       setNewTask({ title: "", description: "", priority: "Medium" });
+      toast.success("Task added successfully!");
     } catch {
-      alert("Failed to add task");
+      toast.error("Failed to add task");
+    } finally {
+      setLoading(false);
     }
   };
 
@@ -77,6 +86,7 @@ const Dashboard = () => {
         );
         socket.emit("task-changed", { taskId: draggableId, newStatus });
       }
+      toast.success("Task status updated!");
     } catch (err) {
       if (err.response?.status === 409) {
         const confirm = window.confirm(
@@ -94,26 +104,26 @@ const Dashboard = () => {
           socket.emit("task-changed", { taskId: draggableId, newStatus });
         }
       } else {
-        alert("Failed to update task status");
+        toast.error("Failed to update task status");
       }
     }
   };
 
   const handleSmartAssign = async (taskId) => {
+    setAssigningTaskId(taskId);
     try {
       const res = await API.put(
         `/tasks/smart-assign/${taskId}`,
         {},
-        {
-          headers: { Authorization: `Bearer ${token}` },
-        }
+        { headers: { Authorization: `Bearer ${token}` } }
       );
-
       setTasks((prev) => prev.map((t) => (t._id === taskId ? res.data : t)));
-
       socket.emit("task-updated", res.data);
+      toast.success("Smart assigned!");
     } catch {
-      alert("Smart assign failed");
+      toast.error("Smart assign failed");
+    } finally {
+      setAssigningTaskId(null);
     }
   };
 
@@ -141,12 +151,13 @@ const Dashboard = () => {
   // ──────────────────────── Render ────────────────────────
 
   return (
-    <div style={{ display: "flex" }}>
-      <div style={{ flex: 1, paddingRight: "1rem" }}>
+    <div className="min-h-screen bg-slate-950 text-white p-6 flex flex-col md:flex-row gap-6 overflow-x-auto">
+      {/* Left Side: Form + Board */}
+      <div className="flex-1 space-y-6">
         {/* Add Task Form */}
-        <div style={formContainerStyle}>
-          <h3>Add New Task</h3>
-          <form onSubmit={handleAddTask} style={formStyle}>
+        <div className="bg-slate-900 p-6 rounded-xl shadow-lg">
+          <h3 className="text-2xl font-semibold mb-4">Add New Task</h3>
+          <form onSubmit={handleAddTask} className="grid gap-4 md:grid-cols-2">
             <input
               type="text"
               name="title"
@@ -154,7 +165,7 @@ const Dashboard = () => {
               required
               value={newTask.title}
               onChange={handleInputChange}
-              style={inputStyle}
+              className="bg-slate-800 border border-slate-700 rounded-lg p-3 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
             <input
               type="text"
@@ -162,141 +173,98 @@ const Dashboard = () => {
               placeholder="Description"
               value={newTask.description}
               onChange={handleInputChange}
-              style={inputStyle}
+              className="bg-slate-800 border border-slate-700 rounded-lg p-3 text-white placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-indigo-500"
             />
             <select
               name="priority"
               value={newTask.priority}
               onChange={handleInputChange}
-              style={inputStyle}
+              className="bg-slate-800 border border-slate-700 rounded-lg p-3 text-white focus:outline-none focus:ring-2 focus:ring-indigo-500"
             >
               <option value="Low">Low</option>
               <option value="Medium">Medium</option>
               <option value="High">High</option>
             </select>
-            <button type="submit" style={btnStyle}>
-              Add Task
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-3 rounded-lg transition duration-300 flex items-center justify-center"
+            >
+              {loading ? <ClipLoader size={22} color="#fff" /> : "Add Task"}
             </button>
           </form>
         </div>
 
         {/* Kanban Board */}
         <DragDropContext onDragEnd={onDragEnd}>
-          {columns.map((col) => (
-            <Droppable droppableId={col} key={col}>
-              {(provided) => (
-                <div
-                  ref={provided.innerRef}
-                  {...provided.droppableProps}
-                  style={columnStyle}
-                >
-                  <h3>{col}</h3>
-                  {getTasksByStatus(col).map((task, index) => (
-                    <Draggable
-                      draggableId={task._id}
-                      index={index}
-                      key={task._id}
-                    >
-                      {(provided) => (
-                        <div
-                          ref={provided.innerRef}
-                          {...provided.draggableProps}
-                          {...provided.dragHandleProps}
-                          style={{
-                            ...taskCardStyle,
-                            ...provided.draggableProps.style,
-                          }}
-                        >
-                          <strong>{task.title}</strong>
-                          <p>{task.description}</p>
-                          <p style={{ fontSize: "0.8rem", color: "#666" }}>
-                            Priority: {task.priority}
-                          </p>
-                          <p style={{ fontSize: "0.8rem", color: "#888" }}>
-                            Assigned to: {task.assignedTo?.name || "Unassigned"}
-                          </p>
-                          <button
-                            onClick={() => handleSmartAssign(task._id)}
-                            style={smartAssignBtnStyle}
+          <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
+            {columns.map((col) => (
+              <Droppable droppableId={col} key={col}>
+                {(provided) => (
+                  <div
+                    ref={provided.innerRef}
+                    {...provided.droppableProps}
+                    className="bg-slate-900 p-4 rounded-xl min-h-[500px] space-y-4 shadow"
+                  >
+                    <h3 className="text-xl font-semibold mb-2 text-slate-200">
+                      {col}
+                    </h3>
+                    {getTasksByStatus(col).map((task, index) => (
+                      <Draggable
+                        draggableId={task._id}
+                        index={index}
+                        key={task._id}
+                      >
+                        {(provided) => (
+                          <div
+                            ref={provided.innerRef}
+                            {...provided.draggableProps}
+                            {...provided.dragHandleProps}
+                            className="bg-slate-800 p-4 rounded-lg shadow hover:shadow-md transition"
                           >
-                            Smart Assign
-                          </button>
-                        </div>
-                      )}
-                    </Draggable>
-                  ))}
-                  {provided.placeholder}
-                </div>
-              )}
-            </Droppable>
-          ))}
+                            <strong className="block text-white mb-1">
+                              {task.title}
+                            </strong>
+                            <p className="text-slate-400 text-sm mb-1">
+                              {task.description}
+                            </p>
+                            <p className="text-xs text-slate-500">
+                              Priority: {task.priority}
+                            </p>
+                            <p className="text-xs text-slate-500">
+                              Assigned to:{" "}
+                              {task.assignedTo?.name || "Unassigned"}
+                            </p>
+                            <button
+                              onClick={() => handleSmartAssign(task._id)}
+                              disabled={assigningTaskId === task._id}
+                              className="mt-2 text-xs bg-emerald-600 hover:bg-emerald-700 text-white px-3 py-1 rounded transition flex items-center justify-center"
+                            >
+                              {assigningTaskId === task._id ? (
+                                <ClipLoader size={14} color="#fff" />
+                              ) : (
+                                "Smart Assign"
+                              )}
+                            </button>
+                          </div>
+                        )}
+                      </Draggable>
+                    ))}
+                    {provided.placeholder}
+                  </div>
+                )}
+              </Droppable>
+            ))}
+          </div>
         </DragDropContext>
       </div>
 
-      <ActivityLog />
+      {/* Right Side: Activity Log */}
+      <div className="w-full md:w-80">
+        <ActivityLog />
+      </div>
     </div>
   );
-};
-
-// ──────────────────────── Styles ────────────────────────
-
-const formContainerStyle = {
-  marginBottom: "2rem",
-  padding: "1rem",
-  background: "#fff",
-  borderRadius: "8px",
-  boxShadow: "0 2px 4px rgba(0,0,0,0.1)",
-};
-
-const formStyle = {
-  display: "flex",
-  gap: "1rem",
-  flexWrap: "wrap",
-};
-
-const inputStyle = {
-  padding: "0.5rem",
-  fontSize: "1rem",
-  borderRadius: "5px",
-  border: "1px solid #ccc",
-  flex: "1",
-};
-
-const btnStyle = {
-  padding: "0.5rem 1rem",
-  fontSize: "1rem",
-  border: "none",
-  borderRadius: "5px",
-  backgroundColor: "#1976d2",
-  color: "white",
-  cursor: "pointer",
-};
-
-const columnStyle = {
-  flex: 1,
-  backgroundColor: "#f4f4f4",
-  padding: "1rem",
-  borderRadius: "8px",
-  minHeight: "500px",
-};
-
-const taskCardStyle = {
-  backgroundColor: "white",
-  padding: "1rem",
-  marginBottom: "1rem",
-  borderRadius: "5px",
-  boxShadow: "0 1px 3px rgba(0,0,0,0.1)",
-};
-
-const smartAssignBtnStyle = {
-  marginTop: "0.5rem",
-  fontSize: "0.8rem",
-  padding: "0.25rem 0.5rem",
-  background: "#4caf50",
-  color: "white",
-  border: "none",
-  borderRadius: "3px",
-  cursor: "pointer",
 };
 
 export default Dashboard;
