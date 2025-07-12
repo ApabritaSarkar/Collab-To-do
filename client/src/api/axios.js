@@ -1,7 +1,7 @@
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: 'http://localhost:5000/api', // 🔁 change if deployed
+  baseURL: 'https://collab-to-do.onrender.com', // 🔁 change if deployed
 });
 
 export default API;

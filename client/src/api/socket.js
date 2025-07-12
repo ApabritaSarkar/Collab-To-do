@@ -1,5 +1,5 @@
 import { io } from 'socket.io-client';
 
-const socket = io('http://localhost:5000'); // change if deployed
+const socket = io('https://collab-to-do.onrender.com'); // change if deployed
 
 export default socket;
