@@ -2,7 +2,6 @@ import React from "react";
 import RoomInfo from "./partials/RoomInfo";
 import AddTaskForm from "./partials/AddTaskForm";
 import KanbanBoard from "./partials/KanbanBoard";
-import RoomMembers from "./partials/RoomMembers";
 import ActivityLog from "../components/ActivityLog";
 import { useDashboardLogic } from "./partials/useDashboardLogic";
 
@@ -46,7 +45,6 @@ const Dashboard = () => {
 
       {/* Right: Members & Logs */}
       <div className="w-full md:w-80 flex-shrink-0 space-y-6">
-        <RoomMembers roomInfo={roomInfo} />
         <ActivityLog />
       </div>
     </div>

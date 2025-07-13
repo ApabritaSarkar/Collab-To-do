@@ -45,18 +45,13 @@ if (!room.members.some(id => id.toString() === req.user._id.toString())) {
 // Get room details and populate members
 router.get("/:id", auth, async (req, res) => {
   try {
-    const room = await Room.findById(req.params.id).populate("members", "name email");
-
-    console.log("✅ POPULATED ROOM:", room); // <-- Add this log
-
+    const room = await Room.findById(req.params.id).select("name code");
     if (!room) return res.status(404).json({ message: "Room not found" });
-
     res.json(room);
   } catch (err) {
     console.error(err);
     res.status(500).json({ message: "Failed to get room info" });
   }
 });
-
 
 module.exports = router;

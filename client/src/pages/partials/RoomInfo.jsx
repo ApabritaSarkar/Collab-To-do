@@ -16,7 +16,6 @@ const RoomInfo = ({ roomInfo }) => {
         🔐 Code:
         <code className="text-indigo-400 bg-slate-900 px-2 py-1 rounded ml-2 font-mono">{roomInfo.code}</code>
       </p>
-      <p className="text-slate-400">Members: {roomInfo?.members?.length || 0}</p>
     </motion.div>
   );
 };
