@@ -31,7 +31,7 @@ router.post("/join", auth, async (req, res) => {
     const room = await Room.findOne({ code });
     if (!room) return res.status(404).json({ message: "Room not found" });
 
-    if (!room.members.includes(req.user._id)) {
+if (!room.members.some(id => id.toString() === req.user._id.toString())) {
       room.members.push(req.user._id);
       await room.save();
     }
@@ -42,14 +42,21 @@ router.post("/join", auth, async (req, res) => {
   }
 });
 
+// Get room details and populate members
 router.get("/:id", auth, async (req, res) => {
   try {
-    const room = await Room.findById(req.params.id);
+    const room = await Room.findById(req.params.id).populate("members", "name email");
+
+    console.log("✅ POPULATED ROOM:", room); // <-- Add this log
+
     if (!room) return res.status(404).json({ message: "Room not found" });
-    res.json({ name: room.name, code: room.code });
+
+    res.json(room);
   } catch (err) {
+    console.error(err);
     res.status(500).json({ message: "Failed to get room info" });
   }
 });
+
 
 module.exports = router;
