@@ -54,50 +54,18 @@ const Landing = () => {
         initial="hidden"
         animate="visible"
       >
-        {/* Logo Placeholder */}
-        <motion.div variants={itemVariants} className="mb-4">
-          {/* Replace with your actual SVG or Image logo */}
-          <svg
-            className="h-16 w-16 mx-auto text-indigo-400"
-            fill="none"
-            viewBox="0 0 24 24"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M12 6.25278V17.7472M17.7472 12H6.25278"
-            />
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M15 9l-3 3-3-3"
-            />
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={2}
-              d="M9 15l3-3 3 3"
-            />
-          </svg>
-        </motion.div>
-
         <motion.h1
           className="text-6xl md:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-emerald-400 pb-2"
           variants={itemVariants}
         >
           Collabrix
         </motion.h1>
-
         <motion.p
           className="text-xl md:text-2xl text-gray-300 font-light tracking-wide"
           variants={itemVariants}
         >
           Collaborate. Organize. Achieve.
         </motion.p>
-
         {/* Feature Icons */}
         <motion.div
           variants={containerVariants}
@@ -128,7 +96,6 @@ const Landing = () => {
             <p className="mt-2 text-sm text-gray-400">Achieve</p>
           </motion.div>
         </motion.div>
-
         <motion.p
           className="max-w-xl mx-auto text-gray-400 my-10 text-lg"
           variants={itemVariants}
@@ -137,7 +104,6 @@ const Landing = () => {
           seamless project management to real-time collaboration, **Collabrix**
           is where great work happens.
         </motion.p>
-
         <motion.div
           className="flex flex-col sm:flex-row items-center justify-center gap-4"
           variants={containerVariants}
