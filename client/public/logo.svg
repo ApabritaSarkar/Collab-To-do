@@ -1,0 +1,17 @@
+<svg width="100" height="100" viewBox="0 0 100 100" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <title>Collabrix Logo</title>
+  
+  <!-- 
+    This logo represents collaboration and structure.
+    - The two distinct shapes coming together symbolize partnership and teamwork ("Collab").
+    - The overall hexagonal, block-like form represents building and organization ("Brix").
+    - The colors are inspired by the indigo and emerald theme of your landing page.
+  -->
+
+  <!-- The top-left piece (Collaboration part 1) -->
+  <path d="M50 15L20 32.5V67.5L50 85L80 67.5V50L50 67.5V32.5L80 50V32.5L50 15Z" fill="#6366F1"/>
+  
+  <!-- The bottom-right piece (Collaboration part 2) -->
+  <path d="M50 15L80 32.5V67.5L50 85L20 67.5V50L50 32.5V67.5L20 50V32.5L50 15Z" fill="#10B981" opacity="0.85"/>
+
+</svg>

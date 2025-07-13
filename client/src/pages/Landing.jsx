@@ -1,6 +1,7 @@
-import React from 'react';
-import { useNavigate } from 'react-router-dom';
-import { motion } from 'framer-motion';
+import React from "react";
+import { useNavigate } from "react-router-dom";
+import { motion } from "framer-motion";
+import { Briefcase, Users, CheckSquare } from "lucide-react"; // Using lucide-react for icons
 
 const Landing = () => {
   const navigate = useNavigate();
@@ -11,68 +12,156 @@ const Landing = () => {
     visible: {
       opacity: 1,
       transition: {
-        staggerChildren: 0.3,
-        delayChildren: 0.2,
+        staggerChildren: 0.2,
       },
     },
   };
 
   const itemVariants = {
-    hidden: { opacity: 0, y: 50 },
-    visible: { opacity: 1, y: 0, transition: { duration: 0.6, ease: "easeOut" } },
+    hidden: { opacity: 0, y: 20 },
+    visible: {
+      opacity: 1,
+      y: 0,
+      transition: { type: "spring", stiffness: 100 },
+    },
+  };
+
+  const buttonVariants = {
+    hover: {
+      scale: 1.05,
+      boxShadow: "0px 0px 30px rgba(99, 102, 241, 0.5)",
+    },
+    tap: { scale: 0.95 },
+  };
+
+  const featureVariants = {
+    hover: { scale: 1.1, y: -5 },
   };
 
   return (
-    <div className="min-h-screen bg-slate-950 text-white flex items-center justify-center px-6 py-16 overflow-hidden relative">
-      
-      {/* Background Gradient Effect (Optional but enhances visual appeal) */}
-      <div className="absolute inset-0 z-0 bg-gradient-to-br from-gray-900 to-slate-950 opacity-90"></div>
-      
-      <motion.div
-        className="max-w-4xl text-center z-10"
+    <div className="min-h-screen bg-gray-900 text-white flex flex-col items-center justify-center p-4 overflow-hidden">
+      {/* Animated background */}
+      <div className="absolute inset-0 z-0">
+        <div className="absolute inset-0 bg-gradient-to-br from-gray-900 via-gray-800 to-black"></div>
+        <div className="absolute top-0 left-0 h-96 w-96 bg-indigo-600 rounded-full mix-blend-screen filter blur-3xl opacity-20 animate-blob"></div>
+        <div className="absolute top-0 right-0 h-96 w-96 bg-emerald-500 rounded-full mix-blend-screen filter blur-3xl opacity-20 animate-blob animation-delay-2000"></div>
+        <div className="absolute bottom-20 left-20 h-96 w-96 bg-pink-500 rounded-full mix-blend-screen filter blur-3xl opacity-20 animate-blob animation-delay-4000"></div>
+      </div>
+
+      <motion.main
+        className="max-w-5xl text-center z-10"
         variants={containerVariants}
         initial="hidden"
         animate="visible"
       >
+        {/* Logo Placeholder */}
+        <motion.div variants={itemVariants} className="mb-4">
+          {/* Replace with your actual SVG or Image logo */}
+          <svg
+            className="h-16 w-16 mx-auto text-indigo-400"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M12 6.25278V17.7472M17.7472 12H6.25278"
+            />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M15 9l-3 3-3-3"
+            />
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              strokeWidth={2}
+              d="M9 15l3-3 3 3"
+            />
+          </svg>
+        </motion.div>
+
         <motion.h1
-          className="text-5xl sm:text-7xl font-extrabold text-slate-50 mb-8 leading-tight tracking-tight drop-shadow-lg"
+          className="text-6xl md:text-8xl font-black text-transparent bg-clip-text bg-gradient-to-r from-indigo-400 to-emerald-400 pb-2"
           variants={itemVariants}
         >
-          🚀 Real-Time Collaboration.
+          Collabrix
         </motion.h1>
-        
+
         <motion.p
-          className="text-lg sm:text-2xl text-slate-400 mb-12 leading-relaxed max-w-2xl mx-auto"
+          className="text-xl md:text-2xl text-gray-300 font-light tracking-wide"
           variants={itemVariants}
         >
-          Boost productivity and streamline task management with your team in real-time. Secure, fast, and intelligent task assignment.
+          Collaborate. Organize. Achieve.
         </motion.p>
-        
+
+        {/* Feature Icons */}
         <motion.div
-          className="flex flex-col sm:flex-row items-center justify-center gap-6"
+          variants={containerVariants}
+          className="flex justify-center items-center space-x-8 md:space-x-12 my-12"
+        >
+          <motion.div
+            variants={featureVariants}
+            whileHover="hover"
+            className="text-center"
+          >
+            <Users className="h-10 w-10 mx-auto text-indigo-400" />
+            <p className="mt-2 text-sm text-gray-400">Collaborate</p>
+          </motion.div>
+          <motion.div
+            variants={featureVariants}
+            whileHover="hover"
+            className="text-center"
+          >
+            <Briefcase className="h-10 w-10 mx-auto text-emerald-400" />
+            <p className="mt-2 text-sm text-gray-400">Organize</p>
+          </motion.div>
+          <motion.div
+            variants={featureVariants}
+            whileHover="hover"
+            className="text-center"
+          >
+            <CheckSquare className="h-10 w-10 mx-auto text-pink-400" />
+            <p className="mt-2 text-sm text-gray-400">Achieve</p>
+          </motion.div>
+        </motion.div>
+
+        <motion.p
+          className="max-w-xl mx-auto text-gray-400 my-10 text-lg"
+          variants={itemVariants}
+        >
+          The ultimate platform to bring your team's ideas to life. From
+          seamless project management to real-time collaboration, **Collabrix**
+          is where great work happens.
+        </motion.p>
+
+        <motion.div
+          className="flex flex-col sm:flex-row items-center justify-center gap-4"
           variants={containerVariants}
         >
           <motion.button
-            variants={itemVariants}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => navigate('/login')}
-            className="bg-indigo-600 hover:bg-indigo-700 text-white font-semibold py-4 px-12 rounded-full shadow-2xl transition-all duration-300 transform hover:rotate-1 focus:outline-none focus:ring-4 focus:ring-indigo-500/50"
+            variants={buttonVariants}
+            whileHover="hover"
+            whileTap="tap"
+            onClick={() => navigate("/register")}
+            className="w-full sm:w-auto bg-indigo-600 text-white font-bold py-3 px-8 rounded-lg text-lg transition-colors duration-300 hover:bg-indigo-700"
+          >
+            Get Started
+          </motion.button>
+          <motion.button
+            variants={buttonVariants}
+            whileHover="hover"
+            whileTap="tap"
+            onClick={() => navigate("/login")}
+            className="w-full sm:w-auto bg-gray-700 text-gray-200 font-bold py-3 px-8 rounded-lg text-lg transition-colors duration-300 hover:bg-gray-600"
           >
             Login
           </motion.button>
-          
-          <motion.button
-            variants={itemVariants}
-            whileHover={{ scale: 1.05 }}
-            whileTap={{ scale: 0.95 }}
-            onClick={() => navigate('/register')}
-            className="bg-transparent border-2 border-emerald-600 text-emerald-300 hover:bg-emerald-600 hover:text-white font-semibold py-4 px-12 rounded-full shadow-lg transition-all duration-300 transform hover:-translate-y-1"
-          >
-            Register
-          </motion.button>
         </motion.div>
-      </motion.div>
+      </motion.main>
     </div>
   );
 };
